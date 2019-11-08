@@ -8,7 +8,10 @@ pipeline {
       }
       stage('Build Docker image') {
         steps {
-          sh './build_docker.sh'
+          sh '''
+          ./build_docker.sh
+          docker logout
+          '''
         }
       }
       stage('Upload Docker to AWS ECR') {
