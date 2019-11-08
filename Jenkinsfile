@@ -2,11 +2,13 @@ pipeline {
     agent any
     stages {
       stage('Pylint and Build') {
-        steps('Pylint *.py') {
-          sh 'pylint --disable=R,C *.py'
-        },
-        steps('Build Docker image') {
-          sh '.\\run_docker.sh'
+        steps {
+          step('Pylint *.py') {
+            sh 'pylint --disable=R,C *.py'
+          }
+          step('Build Docker image') {
+            sh '.\\run_docker.sh'
+          }
         }
       }
       stage('Safty Scanner') {
