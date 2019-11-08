@@ -8,12 +8,12 @@ pipeline {
       }
       stage('Build Docker image') {
         steps {
-          sh '.\\run_docker.sh'
+          sh 'run_docker.sh'
         }
       }
       stage('Upload Docker image') {
         steps {
-          sh '.\\upload_docker.sh'
+          sh 'upload_docker.sh'
         }
       }
       stage('Upload to AWS') {
