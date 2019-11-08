@@ -21,4 +21,4 @@ EXPOSE 80
 
 ## Step 5:
 # Deploy static website index.html at container launch
-CMD ["python3","-m","http.server","80"]
+CMD ["python3", "-m", "http.server", "80"]

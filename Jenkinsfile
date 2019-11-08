@@ -1,11 +1,12 @@
 pipeline {
     agent any
     stages {
-      stage('Lint HTML') {
+      stage('Pylint *.py') {
         steps {
-          sh 'tidy -q -e index.html'
+          sh 'pylint --disable=R,C *.py'
         }
       }
+'''
       stage('Upload to AWS') {
         steps {
           withAWS(region:'us-east-2',credentials:'blueocean') {
@@ -13,5 +14,6 @@ pipeline {
           }
         }
       }
+'''
     }
 }
