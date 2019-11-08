@@ -4,14 +4,14 @@ pipeline {
       stage('Pylint and Build') {
         steps('Pylint *.py') {
           sh 'pylint --disable=R,C *.py'
-        }
+        },
         steps('Build Docker image') {
           sh '.\\run_docker.sh'
         }
       }
       stage('Safty Scanner') {
         steps('Aqua MicroScanner') {
-          aquaMicroscanner imageName: 'alpine:latest', notCompliesCmd: 'exit 1', onDisallowed: 'fall'
+          aquaMicroscanner imageName: 'alpine:latest',  notCompliesCmd: 'exit 1', onDisallowed: 'fall'
         }
       }
       stage('Upload Docker image') {
