@@ -6,7 +6,7 @@
 # Step 1:
 # Create dockerpath
 # dockerpath=<your docker ID/path>
-dockerpath=bostonhouseflasktest
+dockerpath=movie_web
 dockertag=v1.0
 dockeruser=zhangjyu
 
