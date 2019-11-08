@@ -11,11 +11,6 @@ pipeline {
           sh '.\\run_docker.sh'
         }
       }
-      stage('Safty Scanner') {
-        steps {
-          aquaMicroscanner imageName: 'alpine:latest',  notCompliesCmd: 'exit 1', onDisallowed: 'fall'
-        }
-      }
       stage('Upload Docker image') {
         steps {
           sh '.\\upload_docker.sh'
