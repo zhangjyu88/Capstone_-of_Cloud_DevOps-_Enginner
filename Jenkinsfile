@@ -11,16 +11,12 @@ pipeline {
           sh './build_docker.sh'
         }
       }
-      stage('Upload Docker image') {
+      stage('Upload Docker to AWS ECR') {
         steps {
-          sh './upload_docker.sh'
-        }
-      }
-      stage('Upload to AWS') {
-        steps {
-          abcwithAWS(region:'us-east-2',credentials:'blueocean') {
-            s3Upload(pathStyleAccessEnabled:true, payloadSigningEnabled: true, file:'index.html', bucket:'c3pipelinesdemo')
-          }
+          sh '''
+            docker tag movie_web:v1.0 918031923317.dkr.ecr.us-east-2.amazonaws.com/capstone:latest
+            docker push 918031923317.dkr.ecr.us-east-2.amazonaws.com/capstone:latest
+            '''
         }
       }
     }
