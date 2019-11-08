@@ -14,7 +14,7 @@ pipeline {
       stage('Upload Docker to AWS ECR') {
         steps {
           sh '''
-            docker tag movie_web:v1.0 918031923317.dkr.ecr.us-east-2.amazonaws.com/capstone:latest
+            docker tag movie_web:latest 918031923317.dkr.ecr.us-east-2.amazonaws.com/capstone:latest
             docker push 918031923317.dkr.ecr.us-east-2.amazonaws.com/capstone:latest
             '''
         }
