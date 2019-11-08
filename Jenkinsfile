@@ -8,16 +8,13 @@ pipeline {
       }
       stage('Build Docker image') {
         steps {
-          sh '''
-          ./build_docker.sh
-          docker logout
-          '''
+          sh './build_docker.sh'
         }
       }
       stage('Upload Docker to AWS ECR') {
         steps {
-          withAWS(region:'us-east-2',credentials:'blueocean') {
-            s3Upload(pathStyleAccessEnabled:true, payloadSigningEnabled: true, file:'index.html', bucket:'c3pipelinesdemo')
+          withAWS(region:'us-east-2',credentials:'AWS') {
+            s3Upload(pathStyleAccessEnabled:true, payloadSigningEnabled: true, file:'build_docker.sh', bucket:'c3pipelinesdemo')
           }
         }
       }
