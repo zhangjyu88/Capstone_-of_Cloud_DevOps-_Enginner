@@ -14,13 +14,8 @@ pipeline {
       stage('Upload Docker to AWS ECR') {
         steps {
           withAWS(region:'us-east-2',credentials:'blueocean') {
-            sh '''
-            docker tag movie_web:latest 918031923317.dkr.ecr.us-east-2.amazonaws.com/movie_web:latest
-            aws ecr create-repository --repository-name movie_web
-            docker push 918031923317.dkr.ecr.us-east-2.amazonaws.com/movie_web:latest
-            '''
+            s3Upload(pathStyleAccessEnabled:true, payloadSigningEnabled: true, file:'index.html', bucket:'c3pipelinesdemo')
           }
-
         }
       }
     }
