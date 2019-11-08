@@ -1,18 +1,18 @@
 pipeline {
     agent any
     stages {
-      stage('Pylint and Build') {
+      stage('Pylint *.py') {
         steps {
-          step('Pylint *.py') {
-            sh 'pylint --disable=R,C *.py'
-          }
-          step('Build Docker image') {
-            sh '.\\run_docker.sh'
-          }
+          sh 'pylint --disable=R,C *.py'
+        }
+      }
+      stage('Build Docker image') {
+        steps {
+          sh '.\\run_docker.sh'
         }
       }
       stage('Safty Scanner') {
-        steps('Aqua MicroScanner') {
+        steps {
           aquaMicroscanner imageName: 'alpine:latest',  notCompliesCmd: 'exit 1', onDisallowed: 'fall'
         }
       }
