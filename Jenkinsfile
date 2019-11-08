@@ -8,7 +8,7 @@ pipeline {
       }
       stage('Build Docker image') {
         steps {
-          sh './run_docker.sh'
+          sh './build_docker.sh'
         }
       }
       stage('Upload Docker image') {
