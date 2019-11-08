@@ -11,5 +11,5 @@ docker build --tag=movie_web .
 docker image ls
 
 # Step 3: 
-# Run flask app
+# Run movie website
 docker run -p 8000:80 movie_web
