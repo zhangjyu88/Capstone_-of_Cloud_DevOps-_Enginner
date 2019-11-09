@@ -12,6 +12,8 @@ COPY . /app/
 # Install packages from requirements.txt
 # hadolint ignore=DL3013
 RUN python entertainment_center.py &&\
+    apt-get update &&\
+    apt-get upgrade -y &&\
     pip install --upgrade pip &&\
     pip install --trusted-host pypi.python.org -r requirements.txt
 
