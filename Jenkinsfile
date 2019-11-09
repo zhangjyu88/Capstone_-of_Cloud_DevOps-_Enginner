@@ -11,6 +11,9 @@ pipeline {
           sh './build_docker.sh'
         }
       }
+      stage('Security Scan Docker image') {
+        aquaMicroscanner imageName: "movie_web", notCompliesCmd: 'exit 4', onDisallowed: 'fail', outputFormat: 'html'
+      }
       stage('Upload Docker to AWS ECR') {
         steps {
           withAWS(region:'us-east-2',credentials:'AWS') {
