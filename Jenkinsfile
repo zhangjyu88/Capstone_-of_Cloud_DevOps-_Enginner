@@ -12,17 +12,16 @@ pipeline {
         }
       }
       stage('Security Scan Docker image') {
-        steps {
-          aquaMicroscanner imageName: "movie_web", notCompliesCmd: 'exit 4', onDisallowed: 'fail', outputFormat: 'html'
+        steps{
+          aquaMicroscanner imageName: "movie_web", notCompliesCmd: '', onDisallowed: 'ignore', outputFormat: 'html'
         }
       }
       stage('Upload Docker to AWS ECR') {
         steps {
-          withAWS(region:'us-east-2',credentials:'AWS') {
-            sh '''
-              docker tag movie_web:latest 918031923317.dkr.ecr.us-east-2.amazonaws.com/movie_web:latest
-              docker push 918031923317.dkr.ecr.us-east-2.amazonaws.com/movie_web:latest
-            '''
+          script {
+            docker.withRegistry('https://918031923317.dkr.ecr.us-east-2.amazonaws.com', 'ecr:us-east-2:AWS') {
+              docker.image('movie_web').push('latest')
+            }
           }
         }
       }
