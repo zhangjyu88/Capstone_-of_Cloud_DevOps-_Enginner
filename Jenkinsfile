@@ -3,12 +3,12 @@ pipeline {
     stages {
       stage('Pylint *.py') {
         steps {
-          sh 'pylint --disable=R,C *.py'
+          sh 'pylint --disable=R,C ./docker/*.py'
         }
       }
       stage('Build Docker image') {
         steps {
-          sh './build_docker.sh'
+          sh './docker/build_docker.sh'
         }
       }
       stage('Security Scan Docker image') {
