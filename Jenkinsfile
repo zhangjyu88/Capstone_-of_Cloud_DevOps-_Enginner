@@ -25,5 +25,15 @@ pipeline {
           }
         }
       }
+      stage('Deploy Movie Web to AWS EKS') {
+        steps {
+          dir('k8s') {
+            withAWS(credentials: 'AWS', region: 'us-east-2') {
+              sh "aws eks --region eu-west-1 update-kubeconfig --name movie-web"
+              sh 'kubectl apply -f capstone-k8s.yaml'
+              }
+          }
+        }
+      }
     }
 }

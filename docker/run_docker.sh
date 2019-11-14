@@ -4,7 +4,7 @@
 
 # Step 1:
 # Build image and add a descriptive tag
-docker build --tag=movie_web .
+docker build --tag=movie_web ./docker/
 
 # Step 2: 
 # List docker images
