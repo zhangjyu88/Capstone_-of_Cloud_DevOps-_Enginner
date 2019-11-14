@@ -12,7 +12,7 @@ pipeline {
         }
       }
       stage('Security Scan Docker image') {
-        steps{
+        steps {
           aquaMicroscanner imageName: "movie_web", notCompliesCmd: '', onDisallowed: 'ignore', outputFormat: 'html'
         }
       }
@@ -27,11 +27,9 @@ pipeline {
       }
       stage('Deploy Movie Web to AWS EKS') {
         steps {
-          dir('k8s') {
-            withAWS(credentials: 'AWS', region: 'us-east-2') {
-              sh "aws eks --region eu-west-1 update-kubeconfig --name movie-web"
-              sh 'kubectl apply -f capstone-k8s.yaml'
-              }
+          withAWS(region: 'us-east-2', credentials: 'AWS') {
+            sh "aws eks --region us-east-2 update-kubeconfig --name movie-web"
+            sh 'kubectl apply -f ./k8s/movie_web.json'
           }
         }
       }
