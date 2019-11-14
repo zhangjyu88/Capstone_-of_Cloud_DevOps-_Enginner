@@ -1,0 +1,152 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: >-
+  EKS nodes (AMI family: AmazonLinux2, SSH access: false, private networking:
+  false)
+Resources:
+  EgressInterCluster:
+    Type: 'AWS::EC2::SecurityGroupEgress'
+    Properties:
+      Description: >-
+        Allow control plane to communicate with worker nodes in group
+        standard-workers (kubelet and workload TCP ports)
+      DestinationSecurityGroupId: !Ref SG
+      FromPort: 1025
+      GroupId: !ImportValue 'eksctl-movie-web-cluster::SecurityGroup'
+      IpProtocol: tcp
+      ToPort: 65535
+  EgressInterClusterAPI:
+    Type: 'AWS::EC2::SecurityGroupEgress'
+    Properties:
+      Description: >-
+        Allow control plane to communicate with worker nodes in group
+        standard-workers (workloads using HTTPS port, commonly used with
+        extension API servers)
+      DestinationSecurityGroupId: !Ref SG
+      FromPort: 443
+      GroupId: !ImportValue 'eksctl-movie-web-cluster::SecurityGroup'
+      IpProtocol: tcp
+      ToPort: 443
+  IngressInterCluster:
+    Type: 'AWS::EC2::SecurityGroupIngress'
+    Properties:
+      Description: >-
+        Allow worker nodes in group standard-workers to communicate with control
+        plane (kubelet and workload TCP ports)
+      FromPort: 1025
+      GroupId: !Ref SG
+      IpProtocol: tcp
+      SourceSecurityGroupId: !ImportValue 'eksctl-movie-web-cluster::SecurityGroup'
+      ToPort: 65535
+  IngressInterClusterAPI:
+    Type: 'AWS::EC2::SecurityGroupIngress'
+    Properties:
+      Description: >-
+        Allow worker nodes in group standard-workers to communicate with control
+        plane (workloads using HTTPS port, commonly used with extension API
+        servers)
+      FromPort: 443
+      GroupId: !Ref SG
+      IpProtocol: tcp
+      SourceSecurityGroupId: !ImportValue 'eksctl-movie-web-cluster::SecurityGroup'
+      ToPort: 443
+  IngressInterClusterCP:
+    Type: 'AWS::EC2::SecurityGroupIngress'
+    Properties:
+      Description: >-
+        Allow control plane to receive API requests from worker nodes in group
+        standard-workers
+      FromPort: 443
+      GroupId: !ImportValue 'eksctl-movie-web-cluster::SecurityGroup'
+      IpProtocol: tcp
+      SourceSecurityGroupId: !Ref SG
+      ToPort: 443
+  NodeGroup:
+    Type: 'AWS::AutoScaling::AutoScalingGroup'
+    Properties:
+      DesiredCapacity: '2'
+      LaunchTemplate:
+        LaunchTemplateName: !Sub '${AWS::StackName}'
+        Version: !GetAtt NodeGroupLaunchTemplate.LatestVersionNumber
+      MaxSize: '2'
+      MinSize: '1'
+      Tags:
+        - Key: Name
+          PropagateAtLaunch: 'true'
+          Value: movie-web-standard-workers-Node
+        - Key: kubernetes.io/cluster/movie-web
+          PropagateAtLaunch: 'true'
+          Value: owned
+      VPCZoneIdentifier: !Split 
+        - ','
+        - !ImportValue 'eksctl-movie-web-cluster::SubnetsPublic'
+    UpdatePolicy:
+      AutoScalingRollingUpdate:
+        MaxBatchSize: '1'
+        MinInstancesInService: '0'
+  NodeGroupLaunchTemplate:
+    Type: 'AWS::EC2::LaunchTemplate'
+    Properties:
+      LaunchTemplateData:
+        IamInstanceProfile:
+          Arn: !GetAtt NodeInstanceProfile.Arn
+        ImageId: ami-082bb518441d3954c
+        InstanceType: t3.medium
+        NetworkInterfaces:
+          - AssociatePublicIpAddress: true
+            DeviceIndex: 0
+            Groups:
+              - !ImportValue 'eksctl-movie-web-cluster::SharedNodeSecurityGroup'
+              - !Ref SG
+        UserData: >-
+          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
+      LaunchTemplateName: !Sub '${AWS::StackName}'
+  NodeInstanceProfile:
+    Type: 'AWS::IAM::InstanceProfile'
+    Properties:
+      Path: /
+      Roles:
+        - !Ref NodeInstanceRole
+  NodeInstanceRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action:
+              - 'sts:AssumeRole'
+            Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+        Version: 2012-10-17
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy'
+        - 'arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy'
+        - 'arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly'
+      Path: /
+  SG:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: >-
+        Communication between the control plane and worker nodes in group
+        standard-workers
+      Tags:
+        - Key: kubernetes.io/cluster/movie-web
+          Value: owned
+        - Key: Name
+          Value: !Sub '${AWS::StackName}/SG'
+      VpcId: !ImportValue 'eksctl-movie-web-cluster::VPC'
+Outputs:
+  FeatureLocalSecurityGroup:
+    Value: true
+  FeaturePrivateNetworking:
+    Value: false
+  FeatureSharedSecurityGroup:
+    Value: true
+  InstanceProfileARN:
+    Export:
+      Name: !Sub '${AWS::StackName}::InstanceProfileARN'
+    Value: !GetAtt NodeInstanceProfile.Arn
+  InstanceRoleARN:
+    Export:
+      Name: !Sub '${AWS::StackName}::InstanceRoleARN'
+    Value: !GetAtt NodeInstanceRole.Arn

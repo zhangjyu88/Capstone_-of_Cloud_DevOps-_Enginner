@@ -1,0 +1,60 @@
+{
+   "kind":"ReplicationController",
+   "apiVersion":"v1",
+   "metadata":{
+      "name":"movieweb",
+      "labels":{
+         "app":"movieweb"
+      }
+   },
+   "spec":{
+      "replicas":3,
+      "selector":{
+         "app":"movieweb"
+      },
+      "template":{
+         "metadata":{
+            "labels":{
+               "app":"movieweb"
+            }
+         },
+         "spec":{
+            "containers":[
+               {
+                  "name":"movieweb",
+                  "image":"918031923317.dkr.ecr.us-east-2.amazonaws.com/movie_web:latest",
+                  "ports":[
+                     {
+                        "name":"http-server",
+                        "containerPort":80
+                     }
+                  ]
+               }
+            ]
+         }
+      }
+   }
+}
+
+{
+   "kind":"Service",
+   "apiVersion":"v1",
+   "metadata":{
+      "name":"movieweb",
+      "labels":{
+         "app":"movieweb"
+      }
+   },
+   "spec":{
+      "ports": [
+         {
+           "port":80,
+           "targetPort":"http-server"
+         }
+      ],
+      "selector":{
+         "app":"movieweb"
+      },
+      "type": "LoadBalancer"
+   }
+}
