@@ -25,5 +25,5 @@ hunger_games = media.Movie("The Hunger Games: Mockingjay",
                            "https://m.media-amazon.com/images/M/MV5BNjQzNDI2NTU1Ml5BMl5BanBnXkFtZTgwNTAyMDQ5NjE@._V1_SY1000_CR0,0,657,1000_AL_.jpg",
                            "https://www.youtube.com/watch?v=n-7K_OjsDCQ")
 
-movies = [toystory, avatar, frozen, ratatouille, joker, hungergames]
+movies = [toy_story, avatar, frozen, ratatouille, joker, hunger_games]
 fresh_tomatoes.open_movies_page(movies)
